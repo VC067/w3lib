@@ -1,8 +1,8 @@
 w3lib release notes
 ===================
 
-2.5.1 (unreleased)
-------------------
+Unreleased
+----------
 
 - :func:`~w3lib.url.url_query_cleaner` now matches on percent-encoded parameter
   names while preserving the original parameter name spelling in the returned

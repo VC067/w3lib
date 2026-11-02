@@ -1408,10 +1408,7 @@ class TestUrl:
     def test_url_query_cleaner_percent_encoded(self):
         url = "https://example.org/?%69d=123&other=4"
         assert url_query_parameter(url, "id") == "123"
-        assert (
-            url_query_cleaner(url, ["id"])
-            == "https://example.org/?%69d=123"
-        )
+        assert url_query_cleaner(url, ["id"]) == "https://example.org/?%69d=123"
         assert (
             url_query_cleaner(url, ["id"], remove=True)
             == "https://example.org/?other=4"
@@ -1423,10 +1420,7 @@ class TestUrl:
 
         # Percent-encoded duplicates and unique handling
         url_dup = "https://example.org/?%69d=1&id=2&%69d=3&other=4"
-        assert (
-            url_query_cleaner(url_dup, ["id"])
-            == "https://example.org/?%69d=1"
-        )
+        assert url_query_cleaner(url_dup, ["id"]) == "https://example.org/?%69d=1"
         assert (
             url_query_cleaner(url_dup, ["id"], unique=False)
             == "https://example.org/?%69d=1&id=2&%69d=3"
@@ -1437,10 +1431,7 @@ class TestUrl:
         )
 
         # Parameter list can also specify percent-encoded name or bytes
-        assert (
-            url_query_cleaner(url, ["%69d"])
-            == "https://example.org/?%69d=123"
-        )
+        assert url_query_cleaner(url, ["%69d"]) == "https://example.org/?%69d=123"
         assert (
             url_query_cleaner("https://example.org/?id=123&other=4", ["%69d"])
             == "https://example.org/?id=123"

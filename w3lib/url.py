@@ -442,7 +442,9 @@ def url_query_cleaner(
         {to_unicode(p) if isinstance(p, bytes) else p for p in parameterlist}
         | {
             _unquote(p).decode(errors="replace")
-            for p in (to_unicode(x) if isinstance(x, bytes) else x for x in parameterlist)
+            for p in (
+                to_unicode(x) if isinstance(x, bytes) else x for x in parameterlist
+            )
             if isinstance(p, str) and "%" in p
         }
     )
