@@ -438,7 +438,14 @@ def url_query_cleaner(
     if not query or (not parameterlist and not remove):
         return base if not (keep_fragments and fragment) else f"{base}#{fragment}"
 
-    param_lookup = frozenset(parameterlist)
+    param_lookup = frozenset(
+        {to_unicode(p) if isinstance(p, bytes) else p for p in parameterlist}
+        | {
+            _unquote(p).decode(errors="replace")
+            for p in (to_unicode(x) if isinstance(x, bytes) else x for x in parameterlist)
+            if isinstance(p, str) and "%" in p
+        }
+    )
 
     seen: set[str] | None = set() if unique else None
     result: list[str] = []
@@ -448,6 +455,8 @@ def url_query_cleaner(
             continue
 
         k, _, _ = ksv.partition(kvsep)
+        if "%" in k:
+            k = _unquote(k).decode(errors="replace")
 
         if seen is not None:
             if k in seen:

@@ -1405,6 +1405,62 @@ class TestUrl:
             == "product.html"
         )
 
+    def test_url_query_cleaner_percent_encoded(self):
+        url = "https://example.org/?%69d=123&other=4"
+        assert url_query_parameter(url, "id") == "123"
+        assert (
+            url_query_cleaner(url, ["id"])
+            == "https://example.org/?%69d=123"
+        )
+        assert (
+            url_query_cleaner(url, ["id"], remove=True)
+            == "https://example.org/?other=4"
+        )
+        assert (
+            url_query_cleaner("https://example.org/?id=123&other=4", ["id"])
+            == "https://example.org/?id=123"
+        )
+
+        # Percent-encoded duplicates and unique handling
+        url_dup = "https://example.org/?%69d=1&id=2&%69d=3&other=4"
+        assert (
+            url_query_cleaner(url_dup, ["id"])
+            == "https://example.org/?%69d=1"
+        )
+        assert (
+            url_query_cleaner(url_dup, ["id"], unique=False)
+            == "https://example.org/?%69d=1&id=2&%69d=3"
+        )
+        assert (
+            url_query_cleaner(url_dup, ["id"], remove=True)
+            == "https://example.org/?other=4"
+        )
+
+        # Parameter list can also specify percent-encoded name or bytes
+        assert (
+            url_query_cleaner(url, ["%69d"])
+            == "https://example.org/?%69d=123"
+        )
+        assert (
+            url_query_cleaner("https://example.org/?id=123&other=4", ["%69d"])
+            == "https://example.org/?id=123"
+        )
+
+        # Non-ASCII percent-encoded parameter names
+        url_utf8 = "https://example.org/?%C3%B1=1&other=2"
+        assert url_query_cleaner(url_utf8, ["ñ"]) == "https://example.org/?%C3%B1=1"
+        assert (
+            url_query_cleaner(url_utf8, ["ñ"], remove=True)
+            == "https://example.org/?other=2"
+        )
+
+        # Preserving original key spelling with multiple parameters
+        url_mixed = "https://example.org/?%61=1&b=2&%63=3"
+        assert (
+            url_query_cleaner(url_mixed, ["a", "c"])
+            == "https://example.org/?%61=1&%63=3"
+        )
+
     def test_path_to_file_uri(self):
         if os.name == "nt":
             assert (
